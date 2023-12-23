@@ -1,0 +1,61 @@
+import React, { useState, useEffect } from 'react';
+
+function App() {
+  const [data, setData] = useState(null);
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    fetchData();
+  }, [token]);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('/api/data', {
+        headers: {
+          Authorization: token && `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'user',
+          password: 'password',
+        }),
+      });
+      const result = await response.json();
+      setToken(result.token);
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>SaaS Application</h1>
+        {token ? (
+          <>
+            <p>{data ? data.message : 'Loading...'}</p>
+            <button onClick={() => setToken(null)}>Logout</button>
+          </>
+        ) : (
+          <button onClick={handleLogin}>Login</button>
+        )}
+      </header>
+    </div>
+  );
+}
+
+export defaults app;
